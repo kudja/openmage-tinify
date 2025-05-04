@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Kudja_Tinify>
+            <version>0.1.0</version>
+        </Kudja_Tinify>
+    </modules>
+    <global>
+        <models>
+            <tinify>
+                <class>Kudja_Tinify_Model</class>
+                <resourceModel>tinify_resource</resourceModel>
+            </tinify>
+            <tinify_resource>
+                <class>Kudja_Tinify_Model_Resource</class>
+                <entities>
+                    <queue>
+                        <table>tinify_queue</table>
+                    </queue>
+                </entities>
+            </tinify_resource>
+        </models>
+        <helpers>
+            <tinify>
+                <class>Kudja_Tinify_Helper</class>
+            </tinify>
+        </helpers>
+        <blocks>
+            <tinify>
+                <class>Kudja_Tinify_Block</class>
+            </tinify>
+        </blocks>
+        <resources>
+            <tinify_setup>
+                <setup>
+                    <module>Kudja_Tinify</module>
+                    <class>Mage_Core_Model_Resource_Setup</class>
+                </setup>
+            </tinify_setup>
+        </resources>
+    </global>
+    <frontend>
+        <events>
+            <!-- This event is triggered in Lesti_Fpc if page not yet cached -->
+            <fpc_http_response_send_before>
+                <observers>
+                    <tinify_process_html>
+                        <class>tinify/observer</class>
+                        <method>setFpcFlag</method>
+                    </tinify_process_html>
+                </observers>
+            </fpc_http_response_send_before>
+            <http_response_send_before>
+                <observers>
+                    <tinify_process_html>
+                        <class>tinify/observer</class>
+                        <method>processHtml</method>
+                    </tinify_process_html>
+                </observers>
+            </http_response_send_before>
+        </events>
+        <layout>
+            <updates>
+                <tinify>
+                    <file>kudja/tinify.xml</file>
+                </tinify>
+            </updates>
+        </layout>
+    </frontend>
+    <default>
+        <tinify>
+            <general>
+                <enabled>0</enabled>
+                <conversion_method>cwebp</conversion_method>
+                <allowed_tags>img, source, a, link</allowed_tags>
+                <allowed_attributes>src, srcset, href, data-src, data-srcset, imgsrcset</allowed_attributes>
+                <max_queue_size>50000</max_queue_size>
+                <batch_size>20</batch_size>
+                <cwebp_cmd>cwebp -mt -q 80 -m 6 -pass 10 -af -sharp_yuv '{src}' -o '{target}'</cwebp_cmd>
+                <cron_expr>* * * * *</cron_expr>
+                <api_key backend_model="adminhtml/system_config_backend_encrypted"/>
+            </general>
+        </tinify>
+    </default>
+    <crontab>
+        <jobs>
+            <tinify_convert>
+                <schedule>
+                    <config_path>tinify/general/cron_expr</config_path>
+                </schedule>
+                <run>
+                    <model>tinify/cron::processQueue</model>
+                </run>
+            </tinify_convert>
+        </jobs>
+    </crontab>
+</config>

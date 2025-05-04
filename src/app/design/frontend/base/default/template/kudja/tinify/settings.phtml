@@ -1,0 +1,14 @@
+<?php
+/**
+ * @var Kudja_Tinify_Block_Settings $this
+ */
+
+if (!$this->isEnabled()) {
+    return;
+}
+?>
+<script>
+    window.Tinify = window.Tinify || {};
+    window.Tinify.tags = <?= json_encode($this->getAllowedTags()) ?>;
+    window.Tinify.attributes = <?= json_encode($this->getAllowedAttributes()) ?>;
+</script>

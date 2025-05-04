@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<layout>
+    <default>
+        <reference name="head">
+            <action method="addJs" ifconfig="tinify/general/enabled">
+                <script>kudja/tinify/fallback.js</script>
+                <params>defer</params>
+            </action>
+        </reference>
+        <reference name="before_body_end">
+            <block type="tinify/settings" name="tinify_settings" template="kudja/tinify/settings.phtml" />
+        </reference>
+    </default>
+</layout>

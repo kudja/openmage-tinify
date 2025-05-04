@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Kudja_Tinify>
+            <active>true</active>
+            <codePool>community</codePool>
+        </Kudja_Tinify>
+        <Lesti_Fpc>
+            <depends>
+                <Kudja_Tinify/>
+            </depends>
+        </Lesti_Fpc>
+        <!--MageAssist_LestiFpc>
+            <depends>
+                <Kudja_Tinify/>
+            </depends>
+        </MageAssist_LestiFpc-->
+    </modules>
+</config>

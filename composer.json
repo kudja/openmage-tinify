@@ -1,0 +1,35 @@
+{
+    "name": "kudja/openmage-tinify",
+    "license": "OSL-3.0",
+    "type": "magento-module",
+    "description": "OpenMage (Magento 1) WebP Converter / Image Optimizer",
+    "keywords": [
+        "openmage",
+        "openmage-module",
+        "magento",
+        "webp",
+        "tinify.com",
+        "tinipng.com"
+    ],
+    "homepage": "https://github.com/kudja/openmage-tinify",
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.4",
+        "magento-hackathon/magento-composer-installer": "*"
+    },
+    "extra": {
+        "map": [
+            ["src/app/etc/modules/Kudja_Tinify.xml", "app/etc/modules/Kudja_Tinify.xml"],
+            ["src/app/code/community/Kudja/Tinify/", "app/code/community/Kudja/Tinify/"],
+            ["src/app/design/frontend/base/default/layout/kudja/tinify.xml", "app/design/frontend/base/default/layout/kudja/tinify.xml"],
+            ["src/app/design/frontend/base/default/template/kudja/tinify/", "app/design/frontend/base/default/template/kudja/tinify/"],
+            ["src/js/kudja/tinify/", "js/kudja/tinify/"]
+        ]
+    },
+    "authors": [
+        {
+            "name": "Sergey Kudich",
+            "email": "sk@mageassist.com"
+        }
+    ]
+}
