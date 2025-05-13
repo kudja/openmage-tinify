@@ -35,8 +35,8 @@ class Kudja_Tinify_Model_Queue extends Mage_Core_Model_Abstract
         }
 
         $paths = array_unique($paths);
-
         $hashes = array_map('md5', $paths);
+
         $existing = Mage::getResourceModel('tinify/queue_collection')
                         ->addFieldToFilter('hash', ['in' => $hashes])
                         ->getColumnValues('path');
@@ -46,22 +46,42 @@ class Kudja_Tinify_Model_Queue extends Mage_Core_Model_Abstract
             return $this;
         }
 
-        $storeId = Mage::app()->getStore()->getId();
+        $storeId  = Mage::app()->getStore()->getId();
+        $columns  = ['path', 'hash', 'status', 'store_id'];
 
-        $data = [];
+        $rows = [];
+        $bind = [];
+
+        $i = 0;
         foreach ($toInsert as $path) {
-            $data[] = [
-                'path'     => $path,
-                'hash'     => md5($path),
-                'status'   => 0,
-                'store_id' => $storeId
-            ];
+            $path = trim($path);
+            if (!$path) {
+                continue;
+            }
+
+            $rows[] = "(:path_{$i}, :hash_{$i}, 0, {$storeId})";
+            $bind['path_{$i}'] = $path;
+            $bind['hash_{$i}'] = md5($path);
+
+            $i++;
         }
 
-        $resource        = Mage::getSingleton('core/resource');
-        $writeConnection = $resource->getConnection('core_write');
-        $table           = $this->getResource()->getMainTable();
-        $writeConnection->insertMultiple($table, $data);
+        if (empty($rows)) {
+            return $this;
+        }
+
+        $resource = Mage::getSingleton('core/resource');
+        $write    = $resource->getConnection('core_write');
+        $table    = $this->getResource()->getMainTable();
+
+        $sql = sprintf(
+            'INSERT IGNORE INTO %s (%s) VALUES %s',
+            $table,
+            implode(',', $columns),
+            implode(',', $rows)
+        );
+
+        $write->query($sql, $bind);
 
         return $this;
     }
