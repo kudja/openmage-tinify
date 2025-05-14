@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Kudja_Tinify>
-            <version>0.1.0</version>
+            <version>0.2.0</version>
         </Kudja_Tinify>
     </modules>
     <global>
@@ -76,7 +76,7 @@
                 <allowed_attributes>src, srcset, href, data-src, data-srcset, imgsrcset</allowed_attributes>
                 <max_queue_size>50000</max_queue_size>
                 <batch_size>20</batch_size>
-                <cwebp_cmd>cwebp -mt -q 80 -m 6 -pass 10 -af -sharp_yuv '{src}' -o '{target}'</cwebp_cmd>
+                <cwebp_cmd>cwebp -quiet -mt -q 80 -m 6 -pass 10 -af -sharp_yuv '{src}' -o '{target}'</cwebp_cmd>
                 <cron_expr>* * * * *</cron_expr>
                 <api_key backend_model="adminhtml/system_config_backend_encrypted"/>
             </general>
