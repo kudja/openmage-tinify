@@ -1,6 +1,6 @@
 <?php
 
-class Kudja_Tinify_Model_Processor_Webp
+class Kudja_Tinify_Model_Response_Processor
 {
     /** @var string */
     protected string $baseDir;
@@ -38,15 +38,14 @@ class Kudja_Tinify_Model_Processor_Webp
     {
         $this->batchPaths = [];
 
-        $start = microtime(true);
-        $html = $this->replaceImagesInHtml($html);
+        $html = $this->processHtml($html);
 
         $this->flushBatch();
 
         return $html;
     }
 
-    public function replaceImagesInHtml(string $html): string
+    public function processHtml(string $html): string
     {
         /** @var Kudja_Tinify_Helper_Data $helper */
         $helper = Mage::helper('tinify/data');

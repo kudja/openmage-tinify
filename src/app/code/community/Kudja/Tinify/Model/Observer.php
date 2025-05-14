@@ -39,8 +39,8 @@ class Kudja_Tinify_Model_Observer
         $response = $observer->getEvent()->getResponse();
         $html = $response->getBody();
 
-        /** @var Kudja_Tinify_Model_Processor_Webp $processor */
-        $processor = Mage::getSingleton('tinify/processor_webp');
+        /** @var Kudja_Tinify_Model_Response_Processor $processor */
+        $processor = Mage::getSingleton('tinify/response_processor');
         $html = $processor->process($html);
 
         $response->setBody($html);
