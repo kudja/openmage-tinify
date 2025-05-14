@@ -59,9 +59,9 @@ class Kudja_Tinify_Model_Queue extends Mage_Core_Model_Abstract
                 continue;
             }
 
-            $rows[] = "(:path_{$i}, :hash_{$i}, 0, {$storeId})";
-            $bind['path_{$i}'] = $path;
-            $bind['hash_{$i}'] = md5($path);
+            $rows[] = "(:path_{$i}, :hash_{$i}, 0, $storeId)";
+            $bind["path_{$i}"] = $path;
+            $bind["hash_{$i}"] = md5($path);
 
             $i++;
         }
