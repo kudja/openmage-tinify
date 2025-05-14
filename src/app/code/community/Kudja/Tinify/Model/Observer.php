@@ -30,20 +30,25 @@ class Kudja_Tinify_Model_Observer
             return;
         }
 
-        // TODO: Check ajax
-
-        if (!Mage::getStoreConfigFlag('tinify/general/enabled')) {
+        $helper = Mage::helper('tinify/data');
+        if (!$helper->isEnabled()) {
             return;
         }
 
+        /** @var Mage_Core_Controller_Response_Http $response */
         $response = $observer->getEvent()->getResponse();
-        $html = $response->getBody();
+        $body = $response->getBody();
+        if (empty($body)) {
+            return;
+        }
 
         /** @var Kudja_Tinify_Model_Response_Processor $processor */
         $processor = Mage::getSingleton('tinify/response_processor');
-        $html = $processor->process($html);
 
-        $response->setBody($html);
+        $body = $processor->processHtml($body);
+        $processor->flushBatch();
+
+        $response->setBody($body);
     }
 
 }

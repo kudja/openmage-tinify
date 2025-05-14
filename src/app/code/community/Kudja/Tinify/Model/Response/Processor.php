@@ -17,6 +17,9 @@ class Kudja_Tinify_Model_Response_Processor
     /** @var array */
     protected array $fileExistsCache = [];
 
+    protected string $tagsPattern = "/<(?P<tag>{tags}[^>]*)[^>]+\.(jpe?g|png)(?!\.webp)[^>]*>/i";
+
+    protected string $attributesPattern = "/({attributes})\s*=\s*(['\"])([^\\2]+?)\\2/i";
     /**
      * Constructor
      */
@@ -25,6 +28,17 @@ class Kudja_Tinify_Model_Response_Processor
         $this->baseDir = Mage::getBaseDir();
         $this->baseUrl = str_replace('media/', '', Mage::getBaseUrl('media'));
         $this->scheme  = Mage::app()->getRequest()->getScheme();
+
+        /** @var Kudja_Tinify_Helper_Data $helper */
+        $helper = Mage::helper('tinify/data');
+
+        $tags = $helper->getAllowedTags();
+        $tags = implode('|', $tags);
+        $this->tagsPattern = str_replace('{tags}', $tags, $this->tagsPattern);
+
+        $attributes = $helper->getAllowedAttributes();
+        $attributes = implode('|', $attributes);
+        $this->attributesPattern = str_replace('{attributes}', $attributes, $this->attributesPattern);
     }
 
     /**
@@ -34,40 +48,13 @@ class Kudja_Tinify_Model_Response_Processor
      *
      * @return string
      */
-    public function process(string $html): string
-    {
-        $this->batchPaths = [];
-
-        $html = $this->processHtml($html);
-
-        $this->flushBatch();
-
-        return $html;
-    }
-
     public function processHtml(string $html): string
     {
-        /** @var Kudja_Tinify_Helper_Data $helper */
-        $helper = Mage::helper('tinify/data');
-        $tags = $helper->getAllowedTags();
-        $tags = implode('|', $tags);
-        if (empty($tags)) {
-            return $html;
-        }
-        $tagsPattern = "/<(?P<tag>{$tags}[^>]*)[^>]+\.(jpe?g|png)(?!\.webp)[^>]*>/i";
-
-        $allowedAttributes = $helper->getAllowedAttributes();
-        $allowedAttributes = implode('|', $allowedAttributes);
-        if (empty($allowedAttributes)) {
-            return $html;
-        }
-        $attributesPattern = "/($allowedAttributes)\s*=\s*(['\"])([^\\2]+?)\\2/i";
-
-        return preg_replace_callback($tagsPattern, function ($m) use ($attributesPattern) {
+        return preg_replace_callback($this->tagsPattern, function ($m) {
             $tag = $m[0];
             $modified = $tag;
 
-            preg_match_all($attributesPattern, $tag, $attrMatches, PREG_SET_ORDER);
+            preg_match_all($this->attributesPattern, $tag, $attrMatches, PREG_SET_ORDER);
             foreach ($attrMatches as $attr) {
                 [$attrHtml, $attrName, $attrQuote, $attrValue] = $attr;
 
@@ -166,10 +153,14 @@ class Kudja_Tinify_Model_Response_Processor
      *
      * @return void
      */
-    protected function flushBatch(): void
+    public function flushBatch(): void
     {
-        if (!empty($this->batchPaths)) {
-            Mage::getModel('tinify/queue')->batchAddImages(array_values($this->batchPaths));
+        if (empty($this->batchPaths)) {
+            return;
         }
+
+        Mage::getModel('tinify/queue')->batchAddImages(array_values($this->batchPaths));
+        $this->batchPaths = [];
     }
+
 }
