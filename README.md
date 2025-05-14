@@ -1,48 +1,58 @@
-# OpenMage (Magento 1) WebP images converter
+# WebP Image Optimizer for OpenMage (Magento 1)
 
-- convert images to WebP format and replaces jpg|png images on frontend
-- directly replaces jpg|png with webp on frontend
-- fallback js for browsers that doesn't support webp https://caniuse.com/webp
-- ability to use https://tinify.com/ api to convert images or use local conversion via `cwebp`
+A lightweight module for OpenMage / Magento 1 that replaces `.jpg` and `.png` images with `.webp`.
+
+Magento 2 version available at https://github.com/kudja/magento2-webp
+
+## Features
+
+- Supports both HTML and JSON responses (e.g. AJAX, product data, etc.)
+- Converts on-demand: new image paths are queued and processed via cron
+- Lightweight output rewriting with minimal performance impact
+- Compatible with FPC, custom themes and extensions
+- JS fallback for browsers without WebP support ([WebP support chart](https://caniuse.com/webp))
+- Conversion modes:
+    - Local conversion using `cwebp`
+    - Tinify (tinypng.com) API
 
 ## Installation
-
-### Prerequisites
-
-To use local conversion, you need to install `cwebp` binary. You can find it in the [webp](https://developers.google.com/speed/webp/download) package.
-
-Ubuntu/Debian:
-
-```bash
-apt-get install webp
-```
-
-If you plan to use [tinify](https://github.com/tinify/tinify-php):
-
-```bash
-composer require tinify/tinify
-```
-
-### Install via composer
-
+ 
+Composer (recommended)
 ```bash
 composer require kudja/openmage-tinify
 ```
 
-### Install form git
-
+From git
 ```bash
 composer config repositories.openmage-tinify vcs https://github.com/kudja/openmage-tinify.git
-composer require kudja/openmage-tinify:dev-master
+composer require kudja/openmage-tinify
 ```
 
-### Install via modman
+Via modman
 
 ```bash
 modman clone https://github.com/kudja/openmage-tinify.git
 ```
 
-### Manual installation
+Manual way:
 
 Download zip and extract `src` folder to the magento root.
 
+### Dependencies
+
+For local conversion you need to install `cwebp` binary.
+You can use `apt-get` or `brew` to install it.
+
+Ubuntu/Debian
+```bash
+sudo apt install webp
+```
+
+If you are using [tinify api](https://tinify.com/developers) you need to install `tinify` library.
+```bash
+composer require tinify/tinify
+```
+
+### Configuration
+
+In Magento admin go to `System > Configuration > Kudja > Tinify (WebP)` section.
