@@ -98,6 +98,69 @@ class Kudja_Tinify_Model_Response_Processor
     }
 
     /**
+     * @param string $json
+     *
+     * @return string
+     */
+    public function processJson(string $json): string
+    {
+        $result = $json;
+        try {
+            $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+
+            $data = $this->processArray($data);
+
+            $result = json_encode($data, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            Mage::log('JSON processing error: ' . $e->getMessage(), Zend_Log::ERR, 'tinify.log');
+        } catch (Exception $e) {
+            Mage::log('General error: ' . $e->getMessage(), Zend_Log::ERR, 'tinify.log');
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
+    protected function processArray(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $data[$key] = $this->processArray($value);
+            } elseif (is_string($value)) {
+                if (preg_match('/<[^>]+>/', $value) === 1) {
+                    $data[$key] = $this->processHtml($value);
+                    continue;
+                }
+
+                if (preg_match('~\.(jpe?g|png)$~i', $value)) {
+                    $url = $value;
+                    $path = parse_url($url, PHP_URL_PATH);
+                    if (!$path || !$this->isInternalUrl($url)) {
+                        continue;
+                    }
+
+                    $fullPath = $this->getLocalFilePath($path);
+                    $webpPath = $fullPath . '.webp';
+                    $webpUrl  = $url . '.webp';
+
+                    if ($this->fileExistsCached($webpPath)) {
+                        $data[$key] = $webpUrl;
+                        continue;
+                    }
+
+                    $this->batchPaths[$path] = $path;
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Converts protocol-relative URL to full URL based on current scheme
      *
      * @param string $url

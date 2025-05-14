@@ -35,4 +35,22 @@ class Kudja_Tinify_Helper_Data extends Mage_Core_Helper_Abstract
         return array_map('trim', explode(',', $attributes ?? ''));
     }
 
+    /**
+     * @param array  $headers
+     * @param string $name
+     *
+     * @return string|null
+     */
+    public function getHeader(array $headers, string $name): ?string
+    {
+        $headers = array_reverse($headers);
+        $name = strtolower($name);
+        foreach ($headers as $header) {
+            if (strtolower($header['name']) === $name) {
+                return $header['value'];
+            }
+        }
+
+        return null;
+    }
 }
