@@ -8,6 +8,22 @@ class Kudja_Tinify_Model_Cron
     protected ?string $baseDir = null;
 
     /**
+     * @var Kudja_Tinify_Helper_Data
+     */
+    protected $helper;
+
+    /**
+     * @var Kudja_Tinify_Model_Service_Converter
+     */
+    protected $converter;
+
+    public function __construct()
+    {
+        $this->helper = Mage::helper('tinify/data');
+        $this->converter = Mage::getSingleton('tinify/service_converter');
+    }
+
+    /**
      * @return void
      */
     public function processQueue(): void
@@ -25,106 +41,45 @@ class Kudja_Tinify_Model_Cron
      */
     protected function processQueueForStore($storeId): void
     {
-        if (!Mage::getStoreConfigFlag('tinify/general/enabled', $storeId)) {
+        if (!$this->helper->isEnabled($storeId)) {
             return;
         }
 
-        $limit = (int)Mage::getStoreConfig('tinify/general/batch_size');
-
-        $collection = Mage::getResourceModel('tinify/queue_collection')
-                          ->addFieldToFilter('store_id', $storeId)
-                          ->addFieldToFilter('status', 0)
-                          ->setPageSize($limit)
-                          ->setCurPage(1);
-
-        $conversionMethod = Mage::getStoreConfig('tinify/general/conversion_method');
+        $cwebpCommand = $apiKey = null;
+        $conversionMethod = $this->helper->getConversionMethod($storeId);
         if ($conversionMethod === 'cwebp') {
-            $cwebpCommand = Mage::getStoreConfig('tinify/general/cwebp_cmd');
-            if (!$cmd = trim($cwebpCommand)) {
+            if (!$cwebpCommand = $this->helper->getCwebpCommand($storeId)) {
                 Mage::log("Cwebp command not set [Store ID: $storeId]", Zend_Log::ERR, 'tinify.log');
                 return;
             }
         } elseif ($conversionMethod === 'tinify_api') {
-            $apiKey = Mage::getStoreConfig('tinify/general/api_key');
-            if (!$apiKey) {
+            if (!$apiKey = $this->helper->getApiKey()) {
                 Mage::log("Tinify API key not set [Store ID: $storeId]", Zend_Log::ERR, 'tinify.log');
                 return;
             }
-        }
-
-        foreach ($collection as $item) {
-            $this->processItem($item, $conversionMethod);
-        }
-
-        $this->cleanupQueueSuccess();
-    }
-
-    /**
-     * @param Kudja_Tinify_Model_Queue $item
-     * @param string                   $method
-     *
-     * @return void
-     */
-    protected function processItem(Kudja_Tinify_Model_Queue $item, string $method): void
-    {
-        if (!$this->baseDir) {
-            $this->baseDir = Mage::getBaseDir();
-        }
-        $src = $this->baseDir . DS . ltrim($item->getPath(), '/');
-
-        if (!is_readable($src)) {
-            Mage::log("File not found: $src", Zend_Log::ERR, 'tinify.log');
-            $item->setStatus(-1)->save();
+        } else {
+            Mage::log("Invalid conversion method [Store ID: $storeId]", Zend_Log::ERR, 'tinify.log');
             return;
         }
 
-        $target = $src . '.webp';
+        $conversionLimit = $this->helper->getConversionLimit($storeId);
 
-        try {
-            if ($method === 'cwebp') {
-                $cmd = Mage::getStoreConfig('tinify/general/cwebp_cmd');
-                exec(
-                    str_replace(
-                        ['{src}', '{target}'],
-                        [escapeshellarg($src), escapeshellarg($target)],
-                        $cmd
-                    )
-                );
-            } elseif (
-                $method === 'tinify_api'
-                && $api = Mage::getStoreConfig('tinify/general/api_key')
-            ) {
-                \Tinify\setKey($api);
-                $source = \Tinify\fromFile($src);
-                $source->toFile($src);
-                $converted = $source->convert(["type" => "image/webp"]);
-                $converted->toFile($target);
-            }
+        $collection = Mage::getResourceModel('tinify/queue_collection')
+                          ->addFieldToFilter('store_id', $storeId)
+                          ->addFieldToFilter('status', 0)
+                          ->setPageSize($conversionLimit)
+                          ->setCurPage(1);
 
-            if (!file_exists($target)) {
-                Mage::log("Failed to convert: $src", Zend_Log::ERR, 'tinify.log');
-                $item->setStatus(-1)->save();
-                return;
-            }
+        foreach ($collection as $item) {
+            $relativePath = $item->getPath();
 
+            $success = $this->converter->convert($relativePath, $conversionMethod, $apiKey, $cwebpCommand);
 
-            if (filesize($target) >= filesize($src) ) {
-                unlink($target);
-                Mage::log("Converted filesize > original: $src",  Zend_Log::WARN, 'tinify.log');
-                $item->setStatus(-1)->save();
-                return;
-            }
-
-            $item->setStatus(1)->save();
-
-        } catch (Exception $e) {
-            Mage::log(
-                "Error processing item [Path: {$item->getPath()} ID: {$item->getId()}]: {$e->getMessage()}",
-                Zend_Log::ERR,
-                'tinify.log'
-            );
-            $item->setStatus(-1)->save();
+            $item->setStatus($success ? 1 : -1);
+            $item->save();
         }
+
+        $this->cleanupQueueSuccess();
     }
 
     /**

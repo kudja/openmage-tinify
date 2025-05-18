@@ -90,15 +90,15 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </max_queue_size>
-                        <batch_size translate="label,comment">
-                            <label>Batch Size</label>
+                        <conversion_limit translate="label,comment">
+                            <label>Images per Cron Run</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>100</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Number of images to process in one batch.</comment>
-                        </batch_size>
+                            <comment>Number of images to process in one cron run.</comment>
+                        </conversion_limit>
                         <cron_expr translate="label">
                             <label>Cron Expression</label>
                             <frontend_type>text</frontend_type>

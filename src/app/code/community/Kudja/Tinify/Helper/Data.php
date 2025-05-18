@@ -36,6 +36,46 @@ class Kudja_Tinify_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * @param int|null $storeId
+     *
+     * @return int
+     */
+    public function getConversionLimit(?int $storeId = null): int
+    {
+        return (int)Mage::getStoreConfig('tinify/general/conversion_limit', $storeId);
+    }
+
+    /**
+     * @param int|null $storeId
+     *
+     * @return string
+     */
+    public function getConversionMethod(?int $storeId = null): string
+    {
+        return Mage::getStoreConfig('tinify/general/conversion_method', $storeId);
+    }
+
+    /**
+     * @param int|null $storeId
+     *
+     * @return string
+     */
+    public function getCwebpCommand(?int $storeId = null): string
+    {
+        return Mage::getStoreConfig('tinify/general/cwebp_cmd', $storeId);
+    }
+
+    /**
+     * @param int|null $storeId
+     *
+     * @return string
+     */
+    public function getApiKey(?int $storeId = null): string
+    {
+        return Mage::getStoreConfig('tinify/general/api_key', $storeId);
+    }
+
+    /**
      * @param array  $headers
      * @param string $name
      *
