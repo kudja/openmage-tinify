@@ -41,13 +41,13 @@ class Kudja_Tinify_Model_Cron
         if ($conversionMethod === 'cwebp') {
             $cwebpCommand = Mage::getStoreConfig('tinify/general/cwebp_cmd');
             if (!$cmd = trim($cwebpCommand)) {
-                Mage::log("Cwebp command not set [Store ID: $storeId]", null, 'tinify.log');
+                Mage::log("Cwebp command not set [Store ID: $storeId]", Zend_Log::ERR, 'tinify.log');
                 return;
             }
         } elseif ($conversionMethod === 'tinify_api') {
             $apiKey = Mage::getStoreConfig('tinify/general/api_key');
             if (!$apiKey) {
-                Mage::log("Tinify API key not set [Store ID: $storeId]", null, 'tinify.log');
+                Mage::log("Tinify API key not set [Store ID: $storeId]", Zend_Log::ERR, 'tinify.log');
                 return;
             }
         }
@@ -73,7 +73,7 @@ class Kudja_Tinify_Model_Cron
         $src = $this->baseDir . DS . ltrim($item->getPath(), '/');
 
         if (!is_readable($src)) {
-            Mage::log("File not found: $src", null, 'tinify.log');
+            Mage::log("File not found: $src", Zend_Log::ERR, 'tinify.log');
             $item->setStatus(-1)->save();
             return;
         }
@@ -102,7 +102,7 @@ class Kudja_Tinify_Model_Cron
             }
 
             if (!file_exists($target)) {
-                Mage::log("Failed to convert: $src", null, 'tinify.log');
+                Mage::log("Failed to convert: $src", Zend_Log::ERR, 'tinify.log');
                 $item->setStatus(-1)->save();
                 return;
             }
@@ -110,7 +110,7 @@ class Kudja_Tinify_Model_Cron
 
             if (filesize($target) >= filesize($src) ) {
                 unlink($target);
-                Mage::log("Converted filesize > original: $src", null, 'tinify.log');
+                Mage::log("Converted filesize > original: $src",  Zend_Log::WARN, 'tinify.log');
                 $item->setStatus(-1)->save();
                 return;
             }
@@ -120,7 +120,7 @@ class Kudja_Tinify_Model_Cron
         } catch (Exception $e) {
             Mage::log(
                 "Error processing item [Path: {$item->getPath()} ID: {$item->getId()}]: {$e->getMessage()}",
-                null,
+                Zend_Log::ERR,
                 'tinify.log'
             );
             $item->setStatus(-1)->save();
