@@ -159,4 +159,52 @@ class Kudja_Tinify_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->baseDir . DS . ltrim($path, '/');
     }
 
+    /**
+     * Get webp URL if it exists, otherwise add to queue
+     *
+     * @param string $url
+     * @return string|null
+     */
+    public function getWebpIfExists(string $url)
+    {
+        if (!$this->isInternalUrl($url)) {
+            return null;
+        }
+
+        $relativePath = $this->getRelativePathFromUrl($url);
+        if (!$relativePath) {
+            return null;
+        }
+
+        $absolutePath =$this->getLocalFilePath($relativePath);
+        $webpPath = $absolutePath . '.webp';
+        $webpUrl = $url . '.webp';
+
+        if (file_exists($webpPath)) {
+            return $webpUrl;
+        }
+
+        Mage::getModel('tinify/service_queue')->batchAddImages([$relativePath]);
+
+        return null;
+    }
+
+    /**
+     * @param string $url
+     * @return string|null
+     */
+    public function getRelativePathFromUrl(string $url)
+    {
+        if (!$this->isInternalUrl($url)) {
+            return null;
+        }
+
+        $path = parse_url($url, PHP_URL_PATH);
+        if (!$path) {
+            return null;
+        }
+
+        return $path;
+    }
+
 }
