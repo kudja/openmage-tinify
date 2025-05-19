@@ -3,6 +3,25 @@
 class Kudja_Tinify_Helper_Data extends Mage_Core_Helper_Abstract
 {
 
+    /** @var string */
+    protected string $baseDir;
+
+    /** @var string */
+    protected string $baseUrl;
+
+    /** @var string */
+    protected string $scheme;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->baseDir = Mage::getBaseDir();
+        $this->baseUrl = str_replace('media/', '', Mage::getBaseUrl('media'));
+        $this->scheme  = Mage::app()->getRequest()->getScheme();
+    }
+
     /**
      * @param int|null $storeId
      *
@@ -103,4 +122,41 @@ class Kudja_Tinify_Helper_Data extends Mage_Core_Helper_Abstract
 
         return null;
     }
+
+    /**
+     * Checks whether a URL is internal (belongs to the current base URL)
+     *
+     * @param string $url
+     *
+     * @return bool
+     */
+    public function isInternalUrl(string $url): bool
+    {
+        return strpos($url, 'http') !== 0 || strpos($url, $this->baseUrl) === 0;
+    }
+
+    /**
+     * Converts protocol-relative URL to full URL based on current scheme
+     *
+     * @param string $url
+     *
+     * @return string
+     */
+    public function resolveFullUrl(string $url): string
+    {
+        return strpos($url, '//') === 0 ? $this->scheme . ':' . $url : $url;
+    }
+
+    /**
+     * Resolves local filesystem path from relative URL path
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public function getLocalFilePath(string $path): string
+    {
+        return $this->baseDir . DS . ltrim($path, '/');
+    }
+
 }

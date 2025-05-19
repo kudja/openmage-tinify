@@ -2,14 +2,8 @@
 
 class Kudja_Tinify_Model_Response_Processor
 {
-    /** @var string */
-    protected string $baseDir;
-
-    /** @var string */
-    protected string $baseUrl;
-
-    /** @var string */
-    protected string $scheme;
+    /** @var Kudja_Tinify_Helper_Data */
+    protected $helper;
 
     /** @var array */
     protected array $batchPaths = [];
@@ -25,18 +19,13 @@ class Kudja_Tinify_Model_Response_Processor
      */
     public function __construct()
     {
-        $this->baseDir = Mage::getBaseDir();
-        $this->baseUrl = str_replace('media/', '', Mage::getBaseUrl('media'));
-        $this->scheme  = Mage::app()->getRequest()->getScheme();
+        $this->helper = Mage::helper('tinify/data');
 
-        /** @var Kudja_Tinify_Helper_Data $helper */
-        $helper = Mage::helper('tinify/data');
-
-        $tags = $helper->getAllowedTags();
+        $tags = $this->helper->getAllowedTags();
         $tags = implode('|', $tags);
         $this->tagsPattern = str_replace('{tags}', $tags, $this->tagsPattern);
 
-        $attributes = $helper->getAllowedAttributes();
+        $attributes = $this->helper->getAllowedAttributes();
         $attributes = implode('|', $attributes);
         $this->attributesPattern = str_replace('{attributes}', $attributes, $this->attributesPattern);
     }
@@ -65,16 +54,16 @@ class Kudja_Tinify_Model_Response_Processor
                 foreach ($parts as $part) {
                     if (preg_match('/(?P<url>[^\s]+\.(jpe?g|png))(?!\.webp)(?P<rest>.*)/i', $part, $pm)) {
                         $url     = $pm['url'];
-                        $fullUrl = $this->resolveFullUrl($url);
+                        $fullUrl = $this->helper->resolveFullUrl($url);
                         $rest    = $pm['rest'];
 
                         $path = parse_url($url, PHP_URL_PATH);
-                        if (!$path || !$this->isInternalUrl($fullUrl)) {
+                        if (!$path || !$this->helper->isInternalUrl($fullUrl)) {
                             $newParts[] = $part;
                             continue;
                         }
 
-                        $fullPath = $this->getLocalFilePath($path);
+                        $fullPath = $this->helper->getLocalFilePath($path);
                         $webpPath = $fullPath . '.webp';
                         $webpUrl  = $url . '.webp';
 
@@ -139,11 +128,11 @@ class Kudja_Tinify_Model_Response_Processor
                 if (preg_match('~\.(jpe?g|png)$~i', $value)) {
                     $url = $value;
                     $path = parse_url($url, PHP_URL_PATH);
-                    if (!$path || !$this->isInternalUrl($url)) {
+                    if (!$path || !$this->helper->isInternalUrl($url)) {
                         continue;
                     }
 
-                    $fullPath = $this->getLocalFilePath($path);
+                    $fullPath = $this->helper->getLocalFilePath($path);
                     $webpPath = $fullPath . '.webp';
                     $webpUrl  = $url . '.webp';
 
@@ -158,42 +147,6 @@ class Kudja_Tinify_Model_Response_Processor
         }
 
         return $data;
-    }
-
-    /**
-     * Converts protocol-relative URL to full URL based on current scheme
-     *
-     * @param string $url
-     *
-     * @return string
-     */
-    protected function resolveFullUrl(string $url): string
-    {
-        return strpos($url, '//') === 0 ? $this->scheme . ':' . $url : $url;
-    }
-
-    /**
-     * Checks whether a URL is internal (belongs to the current base URL)
-     *
-     * @param string $url
-     *
-     * @return bool
-     */
-    protected function isInternalUrl(string $url): bool
-    {
-        return strpos($url, 'http') !== 0 || strpos($url, $this->baseUrl) === 0;
-    }
-
-    /**
-     * Resolves local filesystem path from relative URL path
-     *
-     * @param string $path
-     *
-     * @return string
-     */
-    protected function getLocalFilePath(string $path): string
-    {
-        return $this->baseDir . DS . ltrim($path, '/');
     }
 
     /**
