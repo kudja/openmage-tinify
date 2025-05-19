@@ -1,0 +1,7 @@
+{
+  "html": "<div><img src='https://local.host/media/catalog/product/combo1.jpg'></div>",
+  "json_data": {
+    "img": "https://local.host/media/catalog/product/combo2.png",
+    "external": "https://cdn.cdn.com/img.jpg"
+  }
+}

@@ -18,6 +18,9 @@
         "ext-json": "*",
         "magento-hackathon/magento-composer-installer": "*"
     },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
     "extra": {
         "map": [
             ["src/app/etc/modules/Kudja_Tinify.xml", "app/etc/modules/Kudja_Tinify.xml"],
