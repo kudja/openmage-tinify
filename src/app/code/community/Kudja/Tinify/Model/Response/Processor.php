@@ -222,7 +222,7 @@ class Kudja_Tinify_Model_Response_Processor
             return;
         }
 
-        Mage::getModel('tinify/queue')->batchAddImages(array_values($this->batchPaths));
+        Mage::getSingleton('tinify/service_queue')->batchAddImages(array_values($this->batchPaths));
         $this->batchPaths = [];
     }
 

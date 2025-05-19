@@ -32,11 +32,31 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </enabled>
+
+                        <allowed_tags translate="label,comment">
+                            <label>Allowed Tags</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Comma separated list of tags to process.</comment>
+                        </allowed_tags>
+                        <allowed_attributes translate="label,comment">
+                            <label>Allowed Attributes</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Comma separated list of attributes to process.</comment>
+                        </allowed_attributes>
+
                         <conversion_method translate="label">
                             <label>Conversion Method</label>
                             <frontend_type>select</frontend_type>
                             <source_model>tinify/source_method</source_model>
-                            <sort_order>20</sort_order>
+                            <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -48,7 +68,7 @@
                             <depends>
                                 <conversion_method>tinify_api</conversion_method>
                             </depends>
-                            <sort_order>30</sort_order>
+                            <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -59,37 +79,12 @@
                             <depends>
                                 <conversion_method>cwebp</conversion_method>
                             </depends>
-                            <sort_order>30</sort_order>
+                            <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </cwebp_cmd>
-                        <allowed_tags translate="label,comment">
-                            <label>Allowed Tags</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>40</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <comment>Comma separated list of tags to process.</comment>
-                        </allowed_tags>
-                        <allowed_attributes translate="label,comment">
-                            <label>Allowed Attributes</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <comment>Comma separated list of attributes to process.</comment>
-                        </allowed_attributes>
-                        <max_queue_size translate="label">
-                            <label>Max Queue Size</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>100</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </max_queue_size>
+
                         <conversion_limit translate="label,comment">
                             <label>Images per Cron Run</label>
                             <frontend_type>text</frontend_type>
@@ -99,13 +94,21 @@
                             <show_in_store>1</show_in_store>
                             <comment>Number of images to process in one cron run.</comment>
                         </conversion_limit>
+                        <max_queue_size translate="label">
+                            <label>Max Queue Size</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </max_queue_size>
                         <cron_expr translate="label">
                             <label>Cron Expression</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>200</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </cron_expr>
                     </fields>
                 </general>

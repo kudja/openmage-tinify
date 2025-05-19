@@ -8,7 +8,7 @@ class Kudja_Tinify_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return bool
      */
-    public function isEnabled(?int $storeId = null): bool
+    public function isEnabled($storeId = null): bool
     {
         return Mage::getStoreConfigFlag('tinify/general/enabled', $storeId);
     }
@@ -18,7 +18,7 @@ class Kudja_Tinify_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return array
      */
-    public function getAllowedTags(?int $storeId = null): array
+    public function getAllowedTags($storeId = null): array
     {
         $tags = Mage::getStoreConfig('tinify/general/allowed_tags', $storeId);
         return array_map('trim', explode(',', $tags ?? ''));
@@ -29,7 +29,7 @@ class Kudja_Tinify_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return array
      */
-    public function getAllowedAttributes(?int $storeId = null): array
+    public function getAllowedAttributes($storeId = null): array
     {
         $attributes = Mage::getStoreConfig('tinify/general/allowed_attributes', $storeId);
         return array_map('trim', explode(',', $attributes ?? ''));
@@ -40,7 +40,7 @@ class Kudja_Tinify_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return int
      */
-    public function getConversionLimit(?int $storeId = null): int
+    public function getConversionLimit($storeId = null): int
     {
         return (int)Mage::getStoreConfig('tinify/general/conversion_limit', $storeId);
     }
@@ -50,7 +50,7 @@ class Kudja_Tinify_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return string
      */
-    public function getConversionMethod(?int $storeId = null): string
+    public function getConversionMethod($storeId = null): string
     {
         return Mage::getStoreConfig('tinify/general/conversion_method', $storeId);
     }
@@ -60,7 +60,7 @@ class Kudja_Tinify_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return string
      */
-    public function getCwebpCommand(?int $storeId = null): string
+    public function getCwebpCommand($storeId = null): string
     {
         return Mage::getStoreConfig('tinify/general/cwebp_cmd', $storeId);
     }
@@ -70,9 +70,19 @@ class Kudja_Tinify_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return string
      */
-    public function getApiKey(?int $storeId = null): string
+    public function getApiKey($storeId = null): string
     {
         return Mage::getStoreConfig('tinify/general/api_key', $storeId);
+    }
+
+    /**
+     * @param int|null $storeId
+     *
+     * @return int
+     */
+    public function getMaxQueueSize($storeId = null): int
+    {
+        return (int)Mage::getStoreConfig('tinify/general/max_queue_size', $storeId);
     }
 
     /**
@@ -81,7 +91,7 @@ class Kudja_Tinify_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return string|null
      */
-    public function getHeader(array $headers, string $name): ?string
+    public function getHeader(array $headers, string $name)
     {
         $headers = array_reverse($headers);
         $name = strtolower($name);

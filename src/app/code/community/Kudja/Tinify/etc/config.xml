@@ -76,7 +76,7 @@
                 <allowed_attributes>src, srcset, href, data-src, data-srcset, imgsrcset</allowed_attributes>
                 <max_queue_size>50000</max_queue_size>
                 <conversion_limit>50</conversion_limit>
-                <cwebp_cmd>cwebp -quiet -mt -q 80 -m 6 -pass 10 -af -sharp_yuv '{src}' -o '{target}'</cwebp_cmd>
+                <cwebp_cmd>cwebp -quiet -mt -q 80 -m 6 -pass 10 -af -sharp_yuv</cwebp_cmd>
                 <cron_expr>* * * * *</cron_expr>
                 <api_key backend_model="adminhtml/system_config_backend_encrypted"/>
             </general>
